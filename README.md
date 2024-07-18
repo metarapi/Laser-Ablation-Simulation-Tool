@@ -1,4 +1,4 @@
-# Ablation Simulation App
+# Laser Ablation ICPMS Simulation Tool
 
 This application simulates the process of laser ablation, focusing on the visualization of washout profiles and their impact on image quality under various conditions. Utilizing a library of washout profilesgit filter-repo --version, the application highlights the effects of smear induced by dual-peak washout profiles. Built with Python, the application leverages customtkinter for an intuitive user interface and matplotlib for comprehensive plotting capabilities. Users can explore the image quality implications through the Structural Similarity Index (SSIM), providing a quantitative measure of degradation due to smear.
 
