@@ -10,7 +10,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 If you prefer to use the prebuilt version of the application, follow these steps:
 
-1. Download the latest release from the [Releases](link to your releases page) page.
+1. Download the latest release from the [Releases](https://github.com/metarapi/Laser-Ablation-Simulation-Tool/releases/tag/v1.0.0) page.
 2. Unzip the downloaded file to your desired location.
 3. Run the executable `AblationSim.exe` from the command line or double-click it in your file explorer.
 
