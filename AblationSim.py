@@ -186,7 +186,7 @@ class WashoutApp(ctk.CTk):
         subframe3.grid_columnconfigure(0, weight=1)
         subframe3.grid_columnconfigure(1, weight=1)
 
-        self.SSIMLabel = ctk.CTkLabel(subframe3, text="SSIM:     ", font=("Helvetica", 18), text_color="#FFFFFF",  anchor="center")
+        self.SSIMLabel = ctk.CTkLabel(subframe3, text="Structural Similarity Index:     ", font=("Helvetica", 18), text_color="#FFFFFF",  anchor="center")
         self.MappingTimeLabel = ctk.CTkLabel(subframe3, text="Mapping Time:     ", font=("Helvetica", 18), text_color="#FFFFFF",  anchor="center")
         self.SSIMLabel.grid(row=0, column=1, padx=5, pady=5, sticky='nsew')
         self.MappingTimeLabel.grid(row=0, column=0, padx=5, pady=5, sticky='nsew')
@@ -259,22 +259,25 @@ class WashoutApp(ctk.CTk):
         # This subframe holds the toggle button for the RR and SS
         toggleRRSSFrame = ctk.CTkFrame(conditionsStandard_frame, height = 80, width= 50, fg_color='#333333')
         toggleRRSSFrame.grid(row=0, column=0, padx=0, pady=0, sticky='ew')
+        toggleRRSSFrame.grid_forget()
 
         toggleRRSSLabel = ctk.CTkLabel(toggleRRSSFrame, text='Toggle Input Parameter', font=spinerBoxfont)
         toggleRRSSLabel.pack(pady=0, padx = 0, side='top', anchor='center')
+        toggleRRSSLabel.pack_forget()
 
         # Add a segmented button to the frame to toggle between Repetition Rate and Scanning Speed
         self.toggleRRSSSegmentedButton = ctk.CTkSegmentedButton(toggleRRSSFrame, values=["Repetition\n Rate", "Scanning\n Speed"],
                                                             command=self.toggleRRSS, font=("Helvetica", 12))
         self.toggleRRSSSegmentedButton.pack(pady=(0,10), padx = 0, side='top', anchor='center')
         self.toggleRRSSSegmentedButton.set("Repetition\n Rate")
+        self.toggleRRSSSegmentedButton.pack_forget()
 
         self.spinboxRepetitionRateLabel = ctk.CTkLabel(conditionsStandard_frame, text_color='#2FA572', text='Repetition Rate [Hz]', font=spinerBoxLabelFont)
         self.spinboxRepetitionRateLabel.grid(row=1, column=0, padx=5, pady=0, sticky='ew')
 
         self.spinboxRepetitionRate = CTkSpinbox(conditionsStandard_frame,
                             start_value=1000,
-                            min_value=10,
+                            min_value=1,
                             max_value=1000,
                             step_value=1,
                             scroll_value=20,
@@ -290,6 +293,7 @@ class WashoutApp(ctk.CTk):
         # This one controls the scanning speed
         self.spinboxScanningSpeedLabel = ctk.CTkLabel(conditionsStandard_frame, text_color='#888888',text='Scanning Speed [μm/s]', font=spinerBoxLabelFont)
         self.spinboxScanningSpeedLabel.grid(row=3, column=0, padx=5, pady=0, sticky='ew')
+        self.spinboxScanningSpeedLabel.grid_forget()
 
         self.spinboxScanningSpeed = CTkSpinbox(conditionsStandard_frame,
                             start_value=2000,
@@ -303,6 +307,7 @@ class WashoutApp(ctk.CTk):
                             variable=self.scanningSpeed,
                             command=self.changeRepetitionRate)
         self.spinboxScanningSpeed.grid(row=4, column=0, padx=5, pady=(0,5), sticky='ew')
+        self.spinboxScanningSpeed.grid_forget()
 
         ToolTip(self.spinboxScanningSpeed, msg="Use mouse scroll for larger increments", delay=1, follow=True,
             parent_kwargs={"bg": "#2FA572", "padx": 1, "pady": 1},
@@ -643,7 +648,7 @@ class WashoutApp(ctk.CTk):
         progressbar.start()
 
         # Update the SSIM and Mapping Time labels
-        self.SSIMLabel.configure(text="SSIM:     ")
+        self.SSIMLabel.configure(text="Structural Similarity Index:     ")
         self.MappingTimeLabel.configure(text="Mapping Time:     ")
 
         # Create a queue for communication
@@ -680,7 +685,7 @@ class WashoutApp(ctk.CTk):
                     progressbar.stop()
                     progressbar.pack_forget()
                     # Update SSIM and Mapping Time labels
-                    self.SSIMLabel.configure(text="SSIM: {:.3f}".format(max_ssim))
+                    self.SSIMLabel.configure(text="Structural Similarity Index: {:.3f}".format(max_ssim))
                     self.MappingTimeLabel.configure(text="Mapping Time: {:.2f} s".format(mapTime))
                 else:
                     # Handle the error case
