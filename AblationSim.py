@@ -43,6 +43,10 @@ class WashoutApp(ctk.CTk):
         self.previousScanningSpeed = ctk.IntVar(value=2000)
         self.flickerNoise = ctk.IntVar(value=5) # Flicker noise in %, advanced setting
         
+        # Hard coded min and max for scanning speed
+        self.minSS=int(10)
+        self.maxSS=int(10000)
+
         # Save the default crater profile
         self.craterProfileDefault = self.craterProfile
 
@@ -272,7 +276,7 @@ class WashoutApp(ctk.CTk):
         self.toggleRRSSSegmentedButton.set("Repetition\n Rate")
         self.toggleRRSSSegmentedButton.pack_forget()
 
-        self.spinboxRepetitionRateLabel = ctk.CTkLabel(conditionsStandard_frame, text_color='#2FA572', text='Repetition Rate [Hz]', font=spinerBoxLabelFont)
+        self.spinboxRepetitionRateLabel = ctk.CTkLabel(conditionsStandard_frame, text_color='#ffffff', text='Repetition Rate [Hz]', font=spinerBoxLabelFont)
         self.spinboxRepetitionRateLabel.grid(row=1, column=0, padx=5, pady=0, sticky='ew')
 
         self.spinboxRepetitionRate = CTkSpinbox(conditionsStandard_frame,
@@ -290,26 +294,21 @@ class WashoutApp(ctk.CTk):
             parent_kwargs={"bg": "#2FA572", "padx": 1, "pady": 1},
             fg="#ffffff", bg="#1c1c1c", padx=3, pady=3)
 
-        # This one controls the scanning speed
-        self.spinboxScanningSpeedLabel = ctk.CTkLabel(conditionsStandard_frame, text_color='#888888',text='Scanning Speed [μm/s]', font=spinerBoxLabelFont)
+        # Scanning speed frame
+        #self.spinboxScanningSpeedLabel = ctk.CTkLabel(conditionsStandard_frame, text_color='#ffffff',text='Scanning Speed [μm/s]', font=spinerBoxLabelFont)
+        #self.spinboxScanningSpeedLabel.grid(row=3, column=0, padx=5, pady=0, sticky='ew')
+        #self.spinboxScanningSpeedLabel.grid_forget()
+        
+        self.spinboxScanningSpeedLabel = ctk.CTkLabel(conditionsStandard_frame, text_color='#ffffff',text='Scanning Speed [μm/s]', font=spinerBoxLabelFont)
         self.spinboxScanningSpeedLabel.grid(row=3, column=0, padx=5, pady=0, sticky='ew')
-        self.spinboxScanningSpeedLabel.grid_forget()
 
-        self.spinboxScanningSpeed = CTkSpinbox(conditionsStandard_frame,
-                            start_value=2000,
-                            min_value=10,
-                            max_value=10000,
-                            step_value=10,
-                            scroll_value=50,
-                            text_color='#888888',
-                            font = spinerBoxfont,
-                            state = 'disabled',
-                            variable=self.scanningSpeed,
-                            command=self.changeRepetitionRate)
-        self.spinboxScanningSpeed.grid(row=4, column=0, padx=5, pady=(0,5), sticky='ew')
-        self.spinboxScanningSpeed.grid_forget()
+        self.frameScanningSpeed = ctk.CTkFrame(conditionsStandard_frame)
+        self.frameScanningSpeed.grid(row=4, column=0, padx=5, pady=(0,5), sticky='ew')
 
-        ToolTip(self.spinboxScanningSpeed, msg="Use mouse scroll for larger increments", delay=1, follow=True,
+        self.scanningSpeedLabel = ctk.CTkLabel(self.frameScanningSpeed, text='2000', text_color='#aaaaaa', font=spinerBoxfont)
+        self.scanningSpeedLabel.pack(side='top', padx=5, pady=5)    
+       
+        ToolTip(self.frameScanningSpeed, msg="Use mouse scroll for larger increments", delay=1, follow=True,
             parent_kwargs={"bg": "#2FA572", "padx": 1, "pady": 1},
             fg="#ffffff", bg="#1c1c1c", padx=3, pady=3)
 
@@ -428,7 +427,7 @@ class WashoutApp(ctk.CTk):
     def changeRepetitionRate(self, value):
         D = self.dosage.get()
         SS = self.scanningSpeed.get()
-        minSS = max(20 / D, self.spinboxScanningSpeed.min_value) # Minimum possible scanning speed (RR = 1 Hz)
+        minSS = max(20 / D, self.minSS) # Minimum possible scanning speed (RR = 1 Hz)
 
         RR = round(SS / 20 * D, 1)
 
@@ -442,7 +441,7 @@ class WashoutApp(ctk.CTk):
             if SS < minSS:
                 RR = 1
                 SS = minSS
-            self.spinboxScanningSpeed.set(int(SS))
+            self.scanningSpeedLabel.configure(text=str(int(SS)))
             self.scanningSpeed.set(int(SS))
 
         if RR > self.spinboxRepetitionRate.max_value:
@@ -450,7 +449,7 @@ class WashoutApp(ctk.CTk):
             # Recalculate the scanning speed
             SS = round(RR * 20 / self.dosage.get())
             # Update the scanning speed
-            self.spinboxScanningSpeed.set(int(SS))
+            self.scanningSpeedLabel.configure(text=str(int(SS)))
             self.scanningSpeed.set(int(SS))
 
         self.spinboxRepetitionRate.set(int(RR))
@@ -459,14 +458,14 @@ class WashoutApp(ctk.CTk):
 
     def changeScanSpeed(self, value):
         SS = round(self.repetitionRate.get() * 20 / self.dosage.get())
-        if SS > self.spinboxScanningSpeed.max_value:
-            SS = self.spinboxScanningSpeed.max_value
+        if SS > self.maxSS:
+            SS = self.maxSS
             # Recalculate the repetition rate
             RR = round(SS * self.dosage.get() / 20, 1)
             # Update the repetition rate
             self.spinboxRepetitionRate.set(int(RR))
             self.repetitionRate.set(int(RR))
-        self.spinboxScanningSpeed.set(int(SS))
+        self.scanningSpeedLabel.configure(text=str(int(SS)))
         self.scanningSpeed.set(int(SS))
         self.previousScanningSpeed.set(int(SS))
 
@@ -488,7 +487,7 @@ class WashoutApp(ctk.CTk):
         self.spinboxDosage.set(dosage)
 
         # Calculate minimum possible scanning speed (minSS)
-        minSS = max(20 / dosage, self.spinboxScanningSpeed.min_value)
+        minSS = max(20 / dosage, self.minSS)
 
         # Set the maximum number of iterations for the adjustment loop
         iterations_max = 10
@@ -503,13 +502,13 @@ class WashoutApp(ctk.CTk):
             # Iterate to adjust RR and SS within their respective bounds
             for _ in range(iterations_max):
                 # If SS exceeds its maximum, adjust RR and set SS to its maximum
-                if SS > self.spinboxScanningSpeed.max_value:
-                    RR = self.repetitionRate.get() * (self.spinboxScanningSpeed.max_value / SS)
+                if SS > self.maxSS:
+                    RR = self.repetitionRate.get() * (self.maxSS / SS)
                     SS = self.spinboxRepetitionRate.max_value
                 # If SS is below its minimum, adjust RR and set SS to its minimum
-                elif SS < self.spinboxScanningSpeed.min_value:
-                    RR = self.repetitionRate.get() * (self.spinboxScanningSpeed.min_value / SS)
-                    SS = self.spinboxScanningSpeed.min_value
+                elif SS < self.minSS:
+                    RR = self.repetitionRate.get() * (self.minSS / SS)
+                    SS = self.minSS
                 # Ensure RR is within its bounds
                 RR = min(max(RR, self.spinboxRepetitionRate.min_value), self.spinboxRepetitionRate.max_value)
 
@@ -526,7 +525,7 @@ class WashoutApp(ctk.CTk):
                         SS = minSS
 
                 # Break the loop if both RR and SS are within their bounds
-                if (SS >= self.spinboxScanningSpeed.min_value and SS <= self.spinboxScanningSpeed.max_value) and (RR >= self.spinboxRepetitionRate.min_value and RR <= self.spinboxRepetitionRate.max_value):
+                if (SS >= self.minSS and SS <= self.maxSS) and (RR >= self.spinboxRepetitionRate.min_value and RR <= self.spinboxRepetitionRate.max_value):
                     break
 
         else:
@@ -560,11 +559,11 @@ class WashoutApp(ctk.CTk):
                         SS = minSS
 
                 # Break the loop if both RR and SS are within their bounds
-                if (SS >= self.spinboxScanningSpeed.min_value and SS <= self.spinboxScanningSpeed.max_value) and (RR >= self.spinboxRepetitionRate.min_value and RR <= self.spinboxRepetitionRate.max_value):
+                if (SS >= self.minSS and SS <= self.maxSS) and (RR >= self.spinboxRepetitionRate.min_value and RR <= self.spinboxRepetitionRate.max_value):
                     break
 
         # Set the adjusted values to their respective spinboxes            
-        self.spinboxScanningSpeed.set(int(SS))
+        self.scanningSpeedLabel.configure(text=str(int(SS)))
         self.scanningSpeed.set(int(SS))
         self.spinboxRepetitionRate.set(int(RR))
         self.repetitionRate.set(int(RR))
@@ -574,15 +573,15 @@ class WashoutApp(ctk.CTk):
         if value == "Repetition\n Rate":
             self.useRR.set(True)
             SS = round(self.repetitionRate.get() * 20 / self.dosage.get())
-            if SS > self.spinboxScanningSpeed.max_value:
-                SS = self.spinboxScanningSpeed.max_value
+            if SS > self.maxSS:
+                SS = self.maxSS
                 # Recalculate the repetition rate
                 RR = round(SS * self.dosage.get() / 20)
                 # Update the repetition rate
                 self.spinboxRepetitionRate.set(RR)
-            self.spinboxScanningSpeed.configure(state='disabled', text_color='#888888')
+            self.frameScanningSpeed.configure(state='disabled', text_color='#888888')
             self.spinboxScanningSpeedLabel.configure(text_color='#888888')
-            self.spinboxScanningSpeed.set(SS)
+            self.frameScanningSpeed.set(SS)
             self.scanningSpeed.set(SS)
             self.spinboxRepetitionRate.configure(state='normal', text_color='#ffffff')
             self.spinboxRepetitionRateLabel.configure(text_color='#2FA572')
@@ -594,8 +593,8 @@ class WashoutApp(ctk.CTk):
                 # Recalculate the scanning speed
                 SS = round(RR * 20 / self.dosage.get())
                 # Update the scanning speed
-                self.spinboxScanningSpeed.set(SS)
-            self.spinboxScanningSpeed.configure(state='normal', text_color='#ffffff')
+                self.frameScanningSpeed.set(SS)
+            self.frameScanningSpeed.configure(state='normal', text_color='#ffffff')
             self.spinboxScanningSpeedLabel.configure(text_color='#2FA572')
             self.spinboxRepetitionRate.set(RR)
             self.repetitionRate.set(RR)
