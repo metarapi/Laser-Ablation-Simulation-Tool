@@ -46,9 +46,3 @@ git clone https://github.com/metarapi/Laser-Ablation-Simulation-Tool.git
 nuitka --windows-disable-console --standalone --enable-plugin=tk-inter --windows-icon-from-ico=icon.ico --include-data-file=icon.ico=./icon.ico --include-data-file=RRs.npy=./RRs.npy --include-data-file=nuclideNames.npy=./nuclideNames.npy --include-data-file=fluenceLabels.npy=./fluenceLabels.npy --include-data-file=numericArray.npy=./numericArray.npy --include-data-file=washoutProfilesAll.npy=./washoutProfilesAll.npy --include-data-file=reshaped_array.npy=./reshaped_array.npy --include-data-file=Vermeer.csv=./Vermeer.csv --include-data-file=BPn.csv=./BPn.csv --include-data-file=cancel.png=./cancel.png AblationSim.py
 ```
 
-## Third-Party Libraries
-
-This application uses `customtkinter`, which is licensed under the MIT License.
-
-### customtkinter
-
