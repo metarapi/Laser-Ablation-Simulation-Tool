@@ -67,12 +67,12 @@ class WashoutApp(ctk.CTk):
         self.tabview.pack(fill=ctk.BOTH, expand=1, padx=10, pady=10)
 
         # Add tabs to the tab view
-        self.tabview.add("Washout Profiles")
+        self.tabview.add("SPR Profiles")
         self.tabview.add("Image Quality")
         #self.tabview.add("Test tab")
 
         # Create frames for each tab
-        self.tab1 = self.tabview.tab("Washout Profiles")
+        self.tab1 = self.tabview.tab("SPR Profiles")
         self.tab2 = self.tabview.tab("Image Quality")
 
         # Add content to the first tab
@@ -115,9 +115,15 @@ class WashoutApp(ctk.CTk):
                      anchor="nw"
                      ).pack(fill=ctk.X, pady=0, padx=5)
 
+        # Filter out some of the nuclides from the combo box
+        omittedNuclides = ["29Si","31P","34S","47Ti","51V","75As","79Br","85Rb","95Mo","121Sb","127I","147Sm","151Eu","157Gd","163Dy","202Hg"] # Hardcoded list of nuclides to omit
+        nuclideNamesFiltered = self.nuclideNames.copy().tolist()
+        for nuclide in omittedNuclides:
+            nuclideNamesFiltered.remove(nuclide)
+
         # Add controls to the left frame
-        self.comboBox = ctk.CTkComboBox(left_frame, values=self.nuclideNames, state="readonly", command=self.comboBox_currentIndexChanged)
-        self.comboBox.set(self.nuclideNames[0])
+        self.comboBox = ctk.CTkComboBox(left_frame, values=nuclideNamesFiltered, state="readonly", command=self.comboBox_currentIndexChanged)
+        self.comboBox.set(nuclideNamesFiltered[0])
         self.comboBox.pack(pady=0)
 
         self.verticalSlider = ctk.CTkSlider(left_frame, from_=min(self.mappingVector), to=max(self.mappingVector), orientation="vertical",
@@ -812,7 +818,7 @@ class WashoutApp(ctk.CTk):
         # Set labels and title
         self.axes.set_xlabel('Time (ms)', color='#ffffff')
         self.axes.set_ylabel('Signal (cps)', color='#ffffff')
-        self.axes.set_title('Washout Profiles', color='#ffffff')
+        self.axes.set_title('SPR Profiles', color='#ffffff')
         self.axes.tick_params(axis='x', colors='#ffffff')
         self.axes.tick_params(axis='y', colors='#ffffff')
 
